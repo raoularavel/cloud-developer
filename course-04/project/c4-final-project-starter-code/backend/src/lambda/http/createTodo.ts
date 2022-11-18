@@ -8,19 +8,32 @@ import { createTodo } from '../../businessLogic/todos'
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
-    // TODO: Implement creating a new TODO item
-    const newItem = await createTodo(newTodo, event)
+    if (newTodo.name && newTodo.name.length) {
+      // TODO: Implement creating a new TODO item
+      const newItem = await createTodo(newTodo, event)
+      return {
+        statusCode: 201,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true
+        },
+        body: JSON.stringify({
+          item: newItem
+        })
+      }
+    }
     return {
-      statusCode: 201,
+      statusCode: 400,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true
       },
       body: JSON.stringify({
-        item:newItem
+        error: "The name can't be empty."
       })
     }
   }
+
 );
 
 handler.use(
